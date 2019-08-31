@@ -31,14 +31,14 @@ public class MainActivity extends BaseActivity {
     RecyclerView recyclerView;
     MyAdapter adapter;
 
-    String[] display = {"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端"};
-    Class[] classes = {TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class};
+    String[] display = {"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "AutoConnect"};
+    Class[] classes = {TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, AutoConnectActivity.class};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        recyclerView = (RecyclerView)findViewById(R.id.rv);
+        recyclerView = (RecyclerView) findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter = new MyAdapter());
         adapter.refreshDataAndNotifyDataSetChanged(display);
@@ -88,7 +88,7 @@ public class MainActivity extends BaseActivity {
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
-                textView = (TextView)itemView.findViewById(android.R.id.text1);
+                textView = (TextView) itemView.findViewById(android.R.id.text1);
             }
         }
     }

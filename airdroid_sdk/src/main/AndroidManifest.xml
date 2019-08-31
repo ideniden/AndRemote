@@ -1,2 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.luoj.airdroid.sdk" />
+    package="com.luoj.airdroid.sdk">
+
+    <application>
+        <activity android:name="com.luoj.airdroid.activity.InitActivity"
+            android:theme="@style/TransparentActivity"></activity>
+    </application>
+
+</manifest>

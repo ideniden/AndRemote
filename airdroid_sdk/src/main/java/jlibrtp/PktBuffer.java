@@ -412,8 +412,12 @@ public class PktBuffer {
 			oldest = null;
 		} else {
 			//There are more frames
-			oldest = oldest.prevFrameQueueNode;
-			oldest.nextFrameQueueNode = null;
+			if (null != oldest) {
+				oldest = oldest.prevFrameQueueNode;
+			}
+			if (null != oldest) {
+				oldest.nextFrameQueueNode = null;
+			}
 		}
 
 		// Update counters

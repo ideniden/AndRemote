@@ -38,6 +38,10 @@ public class ProjectionService extends Service {
         return mBinder;
     }
 
+    public static final String ACTION_STATE = "action.projectionservice.state";
+    public static final int STATE_STOPED = 0;
+    public static final int STATE_RUNNING = 1;
+
     protected MediaProjectionManager mediaProjectionManager;
     protected MediaProjection mediaProjection;
     protected VirtualDisplay virtualDisplay;
@@ -86,6 +90,12 @@ public class ProjectionService extends Service {
         @Override
         public void run() {
             logd("encode started.");
+
+            logd("notify state changed -> running");
+            Intent runningIntent = new Intent(ACTION_STATE);
+            runningIntent.putExtra("state", STATE_RUNNING);
+            sendBroadcast(runningIntent);
+
             encoder.start();
 
             ByteBuffer[] encoderOutputBuffers = encoder.getOutputBuffers();
@@ -127,19 +137,21 @@ public class ProjectionService extends Service {
                         byte[] data = new byte[bufferInfo.size];
                         try {
                             encodedData.get(data);
-                            if (data[4] == 0x67) {
-                                logd("found sps in encoding. find time->" + count + " , length->" + bufferInfo.size);
-                                logd("sps:" + Arrays.toString(data));
-//                                sps = new byte[bufferInfo.size];
-//                                System.arraycopy(data, 0, sps, 0, sps.length);
-                            } else if (data[4] == 0x68) {
-                                logd("found pps in encoding." + count);
-                            } else if (data[4] == 0x65 || data[4] == 0x25) {
-                                logd("found i_frame in encoding." + count);
-//                                if (null != sps && sps.length > 0) {
-//                                    frameHandler.handle(sps, sps.length);
-//                                    logd("append sps at i_frame");
-//                                }
+                            if (null != data && data.length >= 5) {
+                                if (data[4] == 0x67) {
+                                    logd("found sps in encoding. find time->" + count + " , length->" + bufferInfo.size);
+                                    logd("sps:" + Arrays.toString(data));
+                                    //                                sps = new byte[bufferInfo.size];
+                                    //                                System.arraycopy(data, 0, sps, 0, sps.length);
+                                } else if (data[4] == 0x68) {
+                                    logd("found pps in encoding." + count);
+                                } else if (data[4] == 0x65 || data[4] == 0x25) {
+                                    logd("found i_frame in encoding." + count);
+                                    //                                if (null != sps && sps.length > 0) {
+                                    //                                    frameHandler.handle(sps, sps.length);
+                                    //                                    logd("append sps at i_frame");
+                                    //                                }
+                                }
                             }
 //                            if (null == sps && count > threshold) {
 //                                sps = new byte[]{0, 0, 0, 1, 103, 100, 64, 41, -84, 44, -88, 5, 0, 91, -112};
@@ -178,6 +190,11 @@ public class ProjectionService extends Service {
                 }
                 count += 1;
             }
+
+            logd("notify state changed -> stoped");
+            Intent stopedIntent = new Intent(ACTION_STATE);
+            stopedIntent.putExtra("state", STATE_STOPED);
+            sendBroadcast(stopedIntent);
         }
     };
 

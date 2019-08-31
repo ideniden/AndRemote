@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.luoj.airdroid.AirDroid;
 import com.luoj.airdroid.R;
 import com.luoj.airdroid.Util;
 import com.luoj.airdroid.service.RTPProjectionService;
@@ -31,9 +32,10 @@ public class RTPProjectionActivity extends RTPProjectionServiceActivity {
     }
 
     public void homeClick(View v) {
-        Intent home = new Intent(Intent.ACTION_MAIN);
-        home.addCategory(Intent.CATEGORY_HOME);
-        startActivity(home);
+//        Intent home = new Intent(Intent.ACTION_MAIN);
+//        home.addCategory(Intent.CATEGORY_HOME);
+//        startActivity(home);
+        AirDroid.init(this);
     }
 
     @Override

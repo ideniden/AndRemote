@@ -71,6 +71,9 @@ public class EventInput {
                 SystemClock.uptimeMillis(), x, y, 1.0f);
     }
 
+    public static final int TYPE_TOUCH = 0;
+    public static final int TYPE_KEYCODE = 1;
+
     /**
      * @param type   0touch 1key
      * @param action
@@ -79,9 +82,9 @@ public class EventInput {
      * @param y
      */
     public static String getString(int type, int action, int code, float x, float y) {
-        if (type == 0) {
+        if (type == TYPE_TOUCH) {
             return type + ";" + action + ";" + x + ";" + y;
-        } else if (type == 1) {
+        } else if (type == TYPE_KEYCODE) {
             return type + ";" + action + ";" + code + ";" + 0.0;
         } else {
             return null;
