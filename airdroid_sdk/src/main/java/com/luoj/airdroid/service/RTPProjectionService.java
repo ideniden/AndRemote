@@ -131,7 +131,9 @@ public class RTPProjectionService extends ProjectionService implements Projectio
     public void onDestroy() {
         super.onDestroy();
 
-        unregisterReceiver(orderReceiver);
+        if (init) {
+            unregisterReceiver(orderReceiver);
+        }
 
         if (null != rtpSession) {
             rtpSession.endSession();

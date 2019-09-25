@@ -1,14 +1,17 @@
 package com.luoj.airdroid.activity;
 
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.koushikdutta.async.callback.CompletedCallback;
@@ -34,6 +37,8 @@ import jlibrtp.RTPSession;
 
 public class AutoConnectActivity extends BaseFullScreenActivity {
 
+    ProgressBar progressBar;
+
     TextView tvIp;
     EditText etAddress;
 
@@ -49,13 +54,16 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
 
     @Override
     protected int setScreenWakeLock() {
-        return 1;
+        return PowerManager.FULL_WAKE_LOCK;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_auto_connect);
+
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         tvIp = (TextView) findViewById(R.id.tv_ip);
         tvIp.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
         tvIp.setText("local ip -> " + Util.getIP(this));
@@ -88,8 +96,29 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
             @Override
             public void run() {
                 initRTP();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        checkIntent();
+                    }
+                });
             }
         }).start();
+    }
+
+    private void checkIntent() {
+        final String ip = getIntent().getStringExtra("ip");
+        if (!TextUtils.isEmpty(ip)) {
+            etAddress.setText(ip);
+            etAddress.setVisibility(View.GONE);
+            findViewById(R.id.btn_connect).setVisibility(View.GONE);
+            etAddress.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startClick(findViewById(R.id.btn_connect));
+                }
+            }, 1000);
+        }
     }
 
     public void startClick(View v) {
@@ -176,7 +205,7 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
                     });
                     connectingRemoteServer = false;
 
-                    sendBeginOrder();
+                    onConnectedServer();
                 }
             });
             return true;
@@ -184,16 +213,21 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
         return false;
     }
 
-    private void sendBeginOrder() {
+    private void onConnectedServer() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                progressBar.setVisibility(View.GONE);
                 tvIp.setVisibility(View.GONE);
                 etAddress.setVisibility(View.GONE);
                 findViewById(R.id.btn_connect).setVisibility(View.GONE);
                 findViewById(R.id.btn_back).setVisibility(View.VISIBLE);
             }
         });
+        sendBeginOrder();
+    }
+
+    private void sendBeginOrder() {
         remoteSocketServer.send(AirDroid.getBeginOrder());
     }
 

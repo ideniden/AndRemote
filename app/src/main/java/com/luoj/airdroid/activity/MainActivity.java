@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.luoj.airdroid.BuildConfig;
 import com.luoj.airdroid.R;
 import com.luoj.airdroid.adapter.BaseRecyclerViewAdapter;
 
@@ -31,19 +32,36 @@ public class MainActivity extends BaseActivity {
     RecyclerView recyclerView;
     MyAdapter adapter;
 
-    String[] display = {"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "AutoConnect"};
-    Class[] classes = {TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, AutoConnectActivity.class};
+    //    String[] display = {"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "AutoConnect"};
+//    Class[] classes = {TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, AutoConnectActivity.class};
+//    String[] display = {"以输入IP方式连接"};
+//    Class[] classes = {InputActivity.class};
+    String[] display;
+    Class[] classes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
+
         recyclerView = (RecyclerView) findViewById(R.id.rv);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter = new MyAdapter());
+        initListData();
         adapter.refreshDataAndNotifyDataSetChanged(display);
 
         checkPermission();
+    }
+
+    private void initListData() {
+        if (BuildConfig.DEBUG) {
+            display = new String[]{"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "以输入IP方式连接"};
+            classes = new Class[]{TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, InputActivity.class};
+        } else {
+            display = new String[]{"以输入IP方式连接"};
+            classes = new Class[]{InputActivity.class};
+        }
     }
 
     void checkPermission() {

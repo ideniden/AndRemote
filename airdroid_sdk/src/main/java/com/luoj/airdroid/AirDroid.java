@@ -17,4 +17,9 @@ public class AirDroid {
         return RemoteService.SOCKET_ORDER_BEGIN + ";" + CodecParam.width + ";" + CodecParam.height + ";" + CodecParam.framerate + ";" + CodecParam.bitrate;
     }
 
+    public static void main(String[] args){
+        int percent = (int)((float)1006742 / (float)5678245 * 100f);
+        System.out.println(percent);
+    }
+
 }
