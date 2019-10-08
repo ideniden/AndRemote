@@ -27,15 +27,20 @@ import com.luoj.airdroid.decoder.VideoDecoder2;
 import com.luoj.airdroid.service.RemoteService;
 
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
 
 import jlibrtp.DataFrame;
+import jlibrtp.DebugAppIntf;
 import jlibrtp.Participant;
+import jlibrtp.RTCPAppIntf;
 import jlibrtp.RTPAppIntf;
 import jlibrtp.RTPSession;
 
 public class AutoConnectActivity extends BaseFullScreenActivity {
+
+    String ip;
 
     ProgressBar progressBar;
 
@@ -63,12 +68,19 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_auto_connect);
 
+        ip = getIntent().getStringExtra("ip");
+
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         tvIp = (TextView) findViewById(R.id.tv_ip);
         tvIp.setTextColor(getResources().getColor(R.color.colorPrimary, getTheme()));
         tvIp.setText("local ip -> " + Util.getIP(this));
 
         etAddress = (EditText) findViewById(R.id.et_addrsss);
+        if (!TextUtils.isEmpty(ip)) {
+            etAddress.setText(ip);
+            etAddress.setVisibility(View.GONE);
+            findViewById(R.id.btn_connect).setVisibility(View.GONE);
+        }
 
         surfaceView = (SurfaceView) findViewById(R.id.sv);
         videoDecoder2 = new VideoDecoder2(surfaceView.getHolder().getSurface());
@@ -99,26 +111,16 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        checkIntent();
+                        etAddress.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                startClick(findViewById(R.id.btn_connect));
+                            }
+                        }, 1000);
                     }
                 });
             }
         }).start();
-    }
-
-    private void checkIntent() {
-        final String ip = getIntent().getStringExtra("ip");
-        if (!TextUtils.isEmpty(ip)) {
-            etAddress.setText(ip);
-            etAddress.setVisibility(View.GONE);
-            findViewById(R.id.btn_connect).setVisibility(View.GONE);
-            etAddress.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    startClick(findViewById(R.id.btn_connect));
-                }
-            }, 1000);
-        }
     }
 
     public void startClick(View v) {
@@ -133,8 +135,10 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
         try {
             rtpSession = new RTPSession(new DatagramSocket(RTPParam.RTP_PORT), new DatagramSocket(RTPParam.RTCP_PORT));
             rtpSession.naivePktReception(true);
-            rtpSession.RTPSessionRegister(rtpAppIntf, null, null);
+            rtpSession.RTPSessionRegister(rtpAppIntf, rtcpAppIntf, debugAppIntf);
+            rtpSession.addParticipant(new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT));
             rtpSession.payloadType(96);
+            rtpSession.packetBufferBehavior(0);
             logd("rtp receiver is ready.");
         } catch (SocketException e) {
             logd("init RTPSession failed.");
@@ -160,7 +164,24 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
 
         private void offerDecoder(byte[] buf, int length) {
             videoDecoder2.setVideoData(buf);
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    progressBar.setVisibility(View.GONE);
+                    progressBar.removeCallbacks(visiblePb);
+                    progressBar.postDelayed(visiblePb, 2000);
+                }
+            });
+//            logd(""+rtpSession.naivePktReception(););
         }
+
+        Runnable visiblePb = new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.VISIBLE);
+            }
+        };
 
         @Override
         public void userEvent(int type, Participant[] participant) {
@@ -176,6 +197,58 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
             byte[] result = Arrays.copyOf(first, first.length + second.length);
             System.arraycopy(second, 0, result, first.length, second.length);
             return result;
+        }
+    };
+
+    RTCPAppIntf rtcpAppIntf = new RTCPAppIntf() {
+        @Override
+        public void SRPktReceived(long ssrc, long ntpHighOrder, long ntpLowOrder, long rtpTimestamp, long packetCount, long octetCount, long[] reporteeSsrc, int[] lossFraction, int[] cumulPacketsLost, long[] extHighSeq, long[] interArrivalJitter, long[] lastSRTimeStamp, long[] delayLastSR) {
+            logd("---------------SR pkt info---------------");
+            logd("packetCount -> " + packetCount);
+            logd("octetCount -> " + octetCount);
+            logd("Loss Fraction -> " + (null != lossFraction ? Arrays.toString(lossFraction) : "null"));
+            logd("Cumul Packets Lost -> " + (null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null"));
+            logd("Inter Arrival Jitter -> " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+        }
+
+        @Override
+        public void RRPktReceived(long reporterSsrc, long[] reporteeSsrc, int[] lossFraction, int[] cumulPacketsLost, long[] extHighSeq, long[] interArrivalJitter, long[] lastSRTimeStamp, long[] delayLastSR) {
+            logd("---------------RR pkt info---------------");
+            logd("Loss Fraction -> " + (null != lossFraction ? Arrays.toString(lossFraction) : "null"));
+            logd("Cumul Packets Lost -> " + (null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null"));
+            logd("Inter Arrival Jitter -> " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+        }
+
+        @Override
+        public void SDESPktReceived(Participant[] relevantParticipants) {
+
+        }
+
+        @Override
+        public void BYEPktReceived(Participant[] relevantParticipants, String reason) {
+
+        }
+
+        @Override
+        public void APPPktReceived(Participant part, int subtype, byte[] name, byte[] data) {
+
+        }
+    };
+
+    DebugAppIntf debugAppIntf = new DebugAppIntf() {
+        @Override
+        public void packetReceived(int type, InetSocketAddress socket, String description) {
+            logd("debug packetReceived type -> " + type + " , " + description);
+        }
+
+        @Override
+        public void packetSent(int type, InetSocketAddress socket, String description) {
+            logd("debug packetSent type -> " + type + " , " + description);
+        }
+
+        @Override
+        public void importantEvent(int type, String description) {
+            logd("debug importantEvent type -> " + type + " , " + description);
         }
     };
 

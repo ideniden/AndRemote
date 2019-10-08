@@ -52,7 +52,7 @@ public class RTPSession {
 	  * Debug output is written to System.out</br>
 	  * Debug level for RTCP related things.
 	  */
-	 final static public int rtcpDebugLevel = 0;
+	 final static public int rtcpDebugLevel = 20;
 	 
 	 /** RTP unicast socket */
 	 protected DatagramSocket rtpSock = null;
@@ -679,7 +679,7 @@ public class RTPSession {
 	 * a packet is dropped by the network.
 	 * 
 	 * Packets that arrive in order are not affected, they are passed straight
-	 * to the application.
+	 * 	 * to the application.
 	 * 
 	 * The maximum delay is numberofPackets * packet rate , where the packet rate
 	 * depends on the codec and profile used by the sender.

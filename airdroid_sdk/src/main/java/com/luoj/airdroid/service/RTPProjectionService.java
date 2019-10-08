@@ -14,8 +14,10 @@ import com.luoj.airdroid.RTPParam;
 import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Arrays;
 
 import jlibrtp.Participant;
+import jlibrtp.RTCPAppIntf;
 import jlibrtp.RTPAppIntfWrapper;
 import jlibrtp.RTPSessionWrapper;
 
@@ -38,6 +40,8 @@ public class RTPProjectionService extends ProjectionService implements Projectio
     public static final String ACTION_ORDER = "action.rtpprojectionservice.order";
     public static final String KEY_ORDER = "order";
     public static final String ORDER_STOP = "order.stop";
+
+    public static final String ACTION_RTCP = "action.rtpprojectionservice.rtcp";
 
     boolean init;
 
@@ -66,10 +70,11 @@ public class RTPProjectionService extends ProjectionService implements Projectio
         try {
             setFrameHandler(this);
             rtpSession = new RTPSessionWrapper(new DatagramSocket(RTPParam.RTP_PORT), new DatagramSocket(RTPParam.RTCP_PORT));
-            rtpSession.RTPSessionRegister(rtpAppIntfWrapper, null, null);
+            rtpSession.RTPSessionRegister(rtpAppIntfWrapper, rtcpAppIntf, null);
             Participant participant = new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT);
             rtpSession.addParticipant(participant);
             rtpSession.payloadType(96);
+            rtpSession.packetBufferBehavior();
 
             handler.post(new Runnable() {
                 @Override
@@ -104,6 +109,54 @@ public class RTPProjectionService extends ProjectionService implements Projectio
         @Override
         public void userEvent(int type, Participant[] participant) {
             logd("userEvent->" + type + "," + participant);
+        }
+    };
+
+    RTCPAppIntf rtcpAppIntf = new RTCPAppIntf() {
+        @Override
+        public void SRPktReceived(long ssrc, long ntpHighOrder, long ntpLowOrder, long rtpTimestamp, long packetCount, long octetCount, long[] reporteeSsrc, int[] lossFraction, int[] cumulPacketsLost, long[] extHighSeq, long[] interArrivalJitter, long[] lastSRTimeStamp, long[] delayLastSR) {
+            logd("---------------SR pkt info---------------");
+            logd("packetCount -> " + packetCount);
+            logd("octetCount -> " + octetCount);
+            logd("Loss Fraction -> " + (null != lossFraction ? Arrays.toString(lossFraction) : "null"));
+            logd("Cumul Packets Lost -> " + (null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null"));
+            logd("Inter Arrival Jitter -> " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+        }
+
+        @Override
+        public void RRPktReceived(long reporterSsrc, long[] reporteeSsrc, int[] lossFraction, int[] cumulPacketsLost, long[] extHighSeq, long[] interArrivalJitter, long[] lastSRTimeStamp, long[] delayLastSR) {
+            logd("---------------RR pkt info---------------");
+            logd("Loss Fraction -> " + (null != lossFraction ? Arrays.toString(lossFraction) : "null"));
+            if (null != lossFraction && lossFraction.length > 0) {
+                logd("Loss Percent -> " + lossPercent(lossFraction[0]) + "%");
+            }
+            logd("Cumul Packets Lost -> " + (null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null"));
+            logd("Inter Arrival Jitter -> " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+            Intent intent = new Intent(ACTION_RTCP);
+            if (null != lossFraction) intent.putExtra("lossFraction", lossFraction);
+            if (null != cumulPacketsLost) intent.putExtra("cumulPacketsLost", cumulPacketsLost);
+            if (null != interArrivalJitter) intent.putExtra("interArrivalJitter", interArrivalJitter);
+            sendBroadcast(intent);
+        }
+
+        int lossPercent(int lossFraction) {
+            int percent = (int) ((float) lossFraction / 256f * 100f);
+            return percent;
+        }
+
+        @Override
+        public void SDESPktReceived(Participant[] relevantParticipants) {
+
+        }
+
+        @Override
+        public void BYEPktReceived(Participant[] relevantParticipants, String reason) {
+
+        }
+
+        @Override
+        public void APPPktReceived(Participant part, int subtype, byte[] name, byte[] data) {
+
         }
     };
 
