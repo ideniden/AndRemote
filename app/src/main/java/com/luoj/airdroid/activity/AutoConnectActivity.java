@@ -136,7 +136,7 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
             rtpSession = new RTPSession(new DatagramSocket(RTPParam.RTP_PORT), new DatagramSocket(RTPParam.RTCP_PORT));
             rtpSession.naivePktReception(true);
             rtpSession.RTPSessionRegister(rtpAppIntf, rtcpAppIntf, debugAppIntf);
-            rtpSession.addParticipant(new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT));
+//            rtpSession.addParticipant(new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT));
             rtpSession.payloadType(96);
             rtpSession.packetBufferBehavior(0);
             logd("rtp receiver is ready.");
