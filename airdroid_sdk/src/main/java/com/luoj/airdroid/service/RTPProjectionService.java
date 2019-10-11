@@ -74,7 +74,7 @@ public class RTPProjectionService extends ProjectionService implements Projectio
             Participant participant = new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT);
             rtpSession.addParticipant(participant);
             rtpSession.payloadType(96);
-            rtpSession.packetBufferBehavior();
+            rtpSession.initSequenceNum();
 
             handler.post(new Runnable() {
                 @Override

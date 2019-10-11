@@ -426,6 +426,7 @@ public class Participant {
 	 */
 	public void debugPrint() {
 		System.out.print(" Participant.debugPrint() SSRC:"+this.ssrc+" CNAME:"+this.cname);
+		System.out.print(" unexpected:"+unexpected);
 		if(this.rtpAddress != null)
 			System.out.print(" RTP:"+this.rtpAddress.toString());
 		if(this.rtcpAddress != null)

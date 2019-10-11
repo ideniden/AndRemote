@@ -70,20 +70,22 @@ public class VideoDecoder2 implements SurfaceHolder.Callback {
     public void setVideoData(byte[] data) {
         //0x67是SPS的NAL头，0x68是PPS的NAL头
 //        if (!withoutSPS) {
-            if (data[4] == 0x67 && !isInitCodec) {
-                logd("found SPS." + data.length);
-                byte[] tmp = new byte[15];
-                //把video中索引0开始的15个数字复制到tmp中索引为0的位置上
-                System.arraycopy(data, 0, tmp, 0, 15);
-                try {
-                    initial(tmp);
-                } catch (Exception e) {
-                    return;
-                }
-            } else if (data[4] == 0x68) {
-                logd("found PPS.");
-                return;
-            }
+
+//            if (data[4] == 0x67 && !isInitCodec) {
+//                logd("found SPS." + data.length);
+//                byte[] tmp = new byte[15];
+//                //把video中索引0开始的15个数字复制到tmp中索引为0的位置上
+//                System.arraycopy(data, 0, tmp, 0, 15);
+//                try {
+//                    initial(tmp);
+//                } catch (Exception e) {
+//                    return;
+//                }
+//            } else if (data[4] == 0x68) {
+//                logd("found PPS.");
+//                return;
+//            }
+
 //        } else {
 //            if (!isInitCodec) {
 //                try {
@@ -98,7 +100,7 @@ public class VideoDecoder2 implements SurfaceHolder.Callback {
 //                    e.printStackTrace();
 //                }
 //            }
-//        }
+//        }X
         try {
             video_data_Queue.put(data);
 //            logd("put data ok.");
@@ -278,11 +280,14 @@ public class VideoDecoder2 implements SurfaceHolder.Callback {
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
         MediaFormat format = MediaFormat.createVideoFormat(CodecParam.mime, CodecParam.width, CodecParam.height);
-////                    format.setByteBuffer("csd-0", ByteBuffer.wrap(data));
-//        byte[] header_sps = {0, 0, 0, 1, 103, 100, 64, 41, -84, 44, -88, 5, 0, 91, -112};
-//        byte[] header_pps = {0, 0, 0, 1, 104, -18, 56, -128};
-//        format.setByteBuffer("csd-0", ByteBuffer.wrap(header_sps));
-//        format.setByteBuffer("csd-1", ByteBuffer.wrap(header_pps));
+        //s8
+//        byte[] header_sps = {0, 0, 0, 1, 103, 66, -128, 31, -38, 1, 64, 22, -23, 72, 40, 48, 48, 54, -123, 9, -88};
+//        byte[] header_pps = {0, 0, 0, 1, 104, -50, 6, -30};
+        //m1
+        byte[] header_sps = {0, 0, 0, 1, 39, 66, 0, 31, -115, 104, 5, 0, 91, -95, 0, 0, 3, 0, 1, 0, 0, 3, 0, 40, 15, 16, 122, -128};
+        byte[] header_pps = {0, 0, 0, 1, 40, -50, 50, 72};
+        format.setByteBuffer("csd-0", ByteBuffer.wrap(header_sps));
+        format.setByteBuffer("csd-1", ByteBuffer.wrap(header_pps));
         try {
             start(format);
         } catch (IOException e) {

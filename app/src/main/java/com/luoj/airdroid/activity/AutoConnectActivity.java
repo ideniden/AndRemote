@@ -134,9 +134,9 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
     private void initRTP() {
         try {
             rtpSession = new RTPSession(new DatagramSocket(RTPParam.RTP_PORT), new DatagramSocket(RTPParam.RTCP_PORT));
-            rtpSession.naivePktReception(true);
+//            rtpSession.naivePktReception(true);
             rtpSession.RTPSessionRegister(rtpAppIntf, rtcpAppIntf, debugAppIntf);
-//            rtpSession.addParticipant(new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT));
+            rtpSession.addParticipant(new Participant(ip, RTPParam.RTP_PORT, RTPParam.RTCP_PORT));
             rtpSession.payloadType(96);
             rtpSession.packetBufferBehavior(0);
             logd("rtp receiver is ready.");
@@ -146,11 +146,64 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
         }
     }
 
+    private boolean connectServer(String ip) {
+        if (!TextUtils.isEmpty(ip) && null == remoteSocketServer && !connectingRemoteServer) {
+            connectingRemoteServer = true;
+            final String uri = "ws://" + ip + ":" + SocketParam.REMOTE_PORT;
+            AsyncHttpClient.getDefaultInstance().websocket(uri, null, new AsyncHttpClient.WebSocketConnectCallback() {
+                @Override
+                public void onCompleted(Exception ex, WebSocket webSocket) {
+                    if (null != ex) {
+                        logd("connect to remote server failed. " + uri);
+                        connectingRemoteServer = false;
+                        return;
+                    }
+                    logd("connect to remote server success. " + uri);
+                    remoteSocketServer = webSocket;
+                    remoteSocketServer.setClosedCallback(new CompletedCallback() {
+                        @Override
+                        public void onCompleted(Exception ex) {
+                            if (null != remoteSocketServer) {
+                                remoteSocketServer.end();
+                                remoteSocketServer = null;
+                                logd("disconnect from remote server.");
+                            }
+                        }
+                    });
+                    connectingRemoteServer = false;
+
+                    onConnectedServer();
+                }
+            });
+            return true;
+        }
+        return false;
+    }
+
+    private void onConnectedServer() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+                tvIp.setVisibility(View.GONE);
+                etAddress.setVisibility(View.GONE);
+                findViewById(R.id.btn_connect).setVisibility(View.GONE);
+                findViewById(R.id.btn_back).setVisibility(View.VISIBLE);
+            }
+        });
+        sendBeginOrder();
+    }
+
+    private void sendBeginOrder() {
+        remoteSocketServer.send(AirDroid.getBeginOrder());
+    }
+
     RTPAppIntf rtpAppIntf = new RTPAppIntf() {
         byte[] buf;
 
         @Override
         public void receiveData(DataFrame frame, Participant participant) {
+            logd("sequenceNumbers->"+Arrays.toString(frame.sequenceNumbers()));
             if (buf == null) {
                 buf = frame.getConcatenatedData();
             } else {
@@ -251,58 +304,6 @@ public class AutoConnectActivity extends BaseFullScreenActivity {
             logd("debug importantEvent type -> " + type + " , " + description);
         }
     };
-
-    private boolean connectServer(String ip) {
-        if (!TextUtils.isEmpty(ip) && null == remoteSocketServer && !connectingRemoteServer) {
-            connectingRemoteServer = true;
-            final String uri = "ws://" + ip + ":" + SocketParam.REMOTE_PORT;
-            AsyncHttpClient.getDefaultInstance().websocket(uri, null, new AsyncHttpClient.WebSocketConnectCallback() {
-                @Override
-                public void onCompleted(Exception ex, WebSocket webSocket) {
-                    if (null != ex) {
-                        logd("connect to remote server failed. " + uri);
-                        connectingRemoteServer = false;
-                        return;
-                    }
-                    logd("connect to remote server success. " + uri);
-                    remoteSocketServer = webSocket;
-                    remoteSocketServer.setClosedCallback(new CompletedCallback() {
-                        @Override
-                        public void onCompleted(Exception ex) {
-                            if (null != remoteSocketServer) {
-                                remoteSocketServer.end();
-                                remoteSocketServer = null;
-                                logd("disconnect from remote server.");
-                            }
-                        }
-                    });
-                    connectingRemoteServer = false;
-
-                    onConnectedServer();
-                }
-            });
-            return true;
-        }
-        return false;
-    }
-
-    private void onConnectedServer() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                progressBar.setVisibility(View.GONE);
-                tvIp.setVisibility(View.GONE);
-                etAddress.setVisibility(View.GONE);
-                findViewById(R.id.btn_connect).setVisibility(View.GONE);
-                findViewById(R.id.btn_back).setVisibility(View.VISIBLE);
-            }
-        });
-        sendBeginOrder();
-    }
-
-    private void sendBeginOrder() {
-        remoteSocketServer.send(AirDroid.getBeginOrder());
-    }
 
     @Override
     protected void onDestroy() {

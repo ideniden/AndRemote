@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 4
-        versionName "1.4"
+        versionCode 5
+        versionName "1.5"
 
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -29,7 +29,11 @@ android {
 //            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
 //        }
 //    }
-
+    android.libraryVariants.all { variant ->
+        variant.outputs.all { output ->
+            outputFileName = "airdroid_${defaultConfig.versionName}.aar"
+        }
+    }
 }
 
 dependencies {

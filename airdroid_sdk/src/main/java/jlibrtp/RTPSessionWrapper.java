@@ -15,6 +15,9 @@ public class RTPSessionWrapper extends RTPSession {
     }
 
     public long[][] sendDataByMutiPkt(byte[] bytes) {
+        if(null == bytes || bytes.length == 0){
+            return null;
+        }
         int dataLength = (bytes.length - 1) / 1480 + 1;
         final byte[][] data = new byte[dataLength][];
         final boolean[] marks = new boolean[dataLength];
@@ -35,4 +38,9 @@ public class RTPSessionWrapper extends RTPSession {
         }
         return sendData(data, null, marks, -1l, null);
     }
+
+    public void initSequenceNum(){
+        super.seqNum = 0;
+    }
+
 }

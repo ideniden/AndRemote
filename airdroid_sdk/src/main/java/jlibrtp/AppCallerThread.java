@@ -79,8 +79,9 @@ public class AppCallerThread extends Thread {
 				Enumeration<Participant> enu = rtpSession.partDb.getParticipants();
 				
 				while(enu.hasMoreElements()) {
-					Participant p = enu.nextElement(); 
-					
+					Participant p = enu.nextElement();
+//					p.debugPrint();
+
 					boolean done = false;
 					//System.out.println(p.ssrc + " " + !done +" " + p.rtpAddress 
 					//		+ " " + rtpSession.naiveReception + " " + p.pktBuffer);

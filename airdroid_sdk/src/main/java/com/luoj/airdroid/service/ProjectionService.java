@@ -120,6 +120,10 @@ public class ProjectionService extends Service {
                 } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
                     MediaFormat newFormat = encoder.getOutputFormat();
                     logd("encoder output format changed: " + newFormat);
+                    if (null != newFormat) {
+                        logd("csd-0=" + Arrays.toString(newFormat.getByteBuffer("csd-0").array()));
+                        logd("csd-1=" + Arrays.toString(newFormat.getByteBuffer("csd-1").array()));
+                    }
                 } else if (encoderStatus < 0) {
                     break;
                 } else {
@@ -146,7 +150,7 @@ public class ProjectionService extends Service {
                                 } else if (data[4] == 0x68) {
                                     logd("found pps in encoding." + count);
                                 } else if (data[4] == 0x65 || data[4] == 0x25) {
-                                    logd("found i_frame in encoding." + count);
+//                                    logd("found i_frame in encoding." + count);
                                     //                                if (null != sps && sps.length > 0) {
                                     //                                    frameHandler.handle(sps, sps.length);
                                     //                                    logd("append sps at i_frame");
