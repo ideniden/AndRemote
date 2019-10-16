@@ -6,8 +6,8 @@ android {
     defaultConfig {
         minSdkVersion 23
         targetSdkVersion 28
-        versionCode 5
-        versionName "1.5"
+        versionCode 6
+        versionName "1.6"
 
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -21,6 +21,11 @@ android {
             minifyEnabled false
             shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    repositories {
+        flatDir {
+            dirs 'libs'
         }
     }
 //    buildTypes {
@@ -38,6 +43,8 @@ android {
 
 dependencies {
 //    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    api(name: 'windowutil_1.0', ext: 'aar')
 
     api 'com.koushikdutta.async:androidasync:2.+'
 

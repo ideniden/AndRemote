@@ -18,7 +18,9 @@ allprojects {
     repositories {
         google()
         jcenter()
-        
+        flatDir {
+            dirs project(':airdroid_sdk').file('libs'),'libs'
+        }
     }
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {

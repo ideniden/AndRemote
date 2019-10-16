@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.text.TextUtils;
 
 import com.luoj.airdroid.RTPParam;
+import com.luoj.airdroid.view.MonitorView;
 
 import java.io.IOException;
 import java.net.DatagramSocket;
@@ -49,6 +50,8 @@ public class RTPProjectionService extends ProjectionService implements Projectio
 
     RTPSessionWrapper rtpSession;
 
+    MonitorView monitorView;
+
     public void start(final String ip, final int resultCode, final Intent data) {
         if (null == rtpSession) new Thread(new Runnable() {
             @Override
@@ -59,6 +62,7 @@ public class RTPProjectionService extends ProjectionService implements Projectio
     }
 
     public void stop() {
+        if (null != monitorView) monitorView.dismiss();
         stopEncode();
         if (null != rtpSession) {
             rtpSession.endSession();
@@ -127,21 +131,26 @@ public class RTPProjectionService extends ProjectionService implements Projectio
         public void RRPktReceived(long reporterSsrc, long[] reporteeSsrc, int[] lossFraction, int[] cumulPacketsLost, long[] extHighSeq, long[] interArrivalJitter, long[] lastSRTimeStamp, long[] delayLastSR) {
             logd("---------------RR pkt info---------------");
             logd("Loss Fraction -> " + (null != lossFraction ? Arrays.toString(lossFraction) : "null"));
-            if (null != lossFraction && lossFraction.length > 0) {
-                logd("Loss Percent -> " + lossPercent(lossFraction[0]) + "%");
-            }
-            logd("Cumul Packets Lost -> " + (null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null"));
-            logd("Inter Arrival Jitter -> " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+
+            final String info = generateMonitorInfo(lossFraction, cumulPacketsLost, interArrivalJitter);
+
             Intent intent = new Intent(ACTION_RTCP);
             if (null != lossFraction) intent.putExtra("lossFraction", lossFraction);
             if (null != cumulPacketsLost) intent.putExtra("cumulPacketsLost", cumulPacketsLost);
-            if (null != interArrivalJitter) intent.putExtra("interArrivalJitter", interArrivalJitter);
+            if (null != interArrivalJitter)
+                intent.putExtra("interArrivalJitter", interArrivalJitter);
             sendBroadcast(intent);
-        }
 
-        int lossPercent(int lossFraction) {
-            int percent = (int) ((float) lossFraction / 256f * 100f);
-            return percent;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (monitorView.isShowing()) {
+                        monitorView.setText(info);
+                    } else {
+                        monitorView.show();
+                    }
+                }
+            });
         }
 
         @Override
@@ -160,11 +169,28 @@ public class RTPProjectionService extends ProjectionService implements Projectio
         }
     };
 
+    String generateMonitorInfo(int[] lossFraction, int[] cumulPacketsLost, long[] interArrivalJitter) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append("Loss Percent : ").append(null != lossFraction && lossFraction.length > 0 ? lossPercent(lossFraction[0]) : "null").append("%");
+        sb.append("\nCumul Packets Lost : ").append(null != cumulPacketsLost ? Arrays.toString(cumulPacketsLost) : "null");
+        sb.append("\nInter Arrival Jitter : " + (null != interArrivalJitter ? Arrays.toString(interArrivalJitter) : "null"));
+        return sb.toString();
+    }
+
+    int lossPercent(int lossFraction) {
+        int percent = (int) ((float) lossFraction / 256f * 100f);
+        return percent;
+    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (!init) {
             logd("start rtp projection service.");
             registerReceiver(orderReceiver, new IntentFilter(ACTION_ORDER));
+
+            monitorView = new MonitorView(this);
+            monitorView.setText(generateMonitorInfo(null, null, null));
+
             init = true;
         }
         return super.onStartCommand(intent, flags, startId);
@@ -186,6 +212,7 @@ public class RTPProjectionService extends ProjectionService implements Projectio
 
         if (init) {
             unregisterReceiver(orderReceiver);
+            monitorView.dismiss();
         }
 
         if (null != rtpSession) {
