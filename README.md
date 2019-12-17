@@ -16,63 +16,63 @@ Android设备间远程控制：
 
 项目结构
 -----------------
-- airdroid_sdk：包含核心功能实现
-├─java
-│  ├─com
-│  │  └─luoj
-│  │      └─airdroid
-│  │          │  AirDroid.java 初始化服务
-│  │          │  CodecParam.java 编解码器参数
-│  │          │  EventInput.java 事件注入
-│  │          │  RTPParam.java
-│  │          │  SocketParam.java 会话传输参数
-│  │          │
-│  │          ├─activity
-│  │          │      InitActivity.java 初始化MediaProjection
-│  │          │
-│  │          ├─adapter
-│  │          ├─decoder
-│  │          │      VideoDecoder.java 已弃用
-│  │          │      VideoDecoder2.java 视频解码器
-│  │          │
-│  │          ├─eventinjection 已弃用
-│  │          │
-│  │          ├─service
-│  │          │      ProjectionService.java 录屏服务
-│  │          │      RemoteServer.java 已弃用
-│  │          │      RemoteServerLauncher.java 已弃用
-│  │          │      RemoteService.java 会话管理服务
-│  │          │      RTPProjectionService.java 录屏编码传输服务
-│  │          │
-│  │          └─view 悬浮窗显示丢包、抖动
-│  │
-│  └─jlibrtp 第三方RTP库
+- airdroid_sdk：包含核心功能实现<br>
+├─java<br>
+│  ├─com<br>
+│  │  └─luoj<br>
+│  │      └─airdroid<br>
+│  │          │  AirDroid.java 初始化服务<br>
+│  │          │  CodecParam.java 编解码器参数<br>
+│  │          │  EventInput.java 事件注入<br>
+│  │          │  RTPParam.java<br>
+│  │          │  SocketParam.java 会话传输参数<br>
+│  │          │<br>
+│  │          ├─activity<br>
+│  │          │      InitActivity.java 初始化MediaProjection<br>
+│  │          │<br>
+│  │          ├─adapter<br>
+│  │          ├─decoder<br>
+│  │          │      VideoDecoder.java 已弃用<br>
+│  │          │      VideoDecoder2.java 视频解码器<br>
+│  │          │<br>
+│  │          ├─eventinjection 已弃用<br>
+│  │          │<br>
+│  │          ├─service<br>
+│  │          │      ProjectionService.java 录屏服务<br>
+│  │          │      RemoteServer.java 已弃用<br>
+│  │          │      RemoteServerLauncher.java 已弃用<br>
+│  │          │      RemoteService.java 会话管理服务<br>
+│  │          │      RTPProjectionService.java 录屏编码传输服务<br>
+│  │          │<br>
+│  │          └─view 悬浮窗显示丢包、抖动<br>
+│  │<br>
+│  └─jlibrtp 第三方RTP库<br>
 
-- app：Demo程序，包含组件初始化、受控端、控制端等范例代码
-├─java
-│  └─com
-│      └─luoj
-│          └─airdroid
-│              │  AppContext.java
-│              │  Util.java
-│              │
-│              ├─activity
-│              │      AutoConnectActivity.java 连接和控制界面
-│              │      InputActivity.java IP输入界面
-│              │      MainActivity.java 功能列表界面
-│              │      RTPPlayActivity.java 已弃用
-│              │      RTPProjectionActivity.java 已弃用
-│              │      RTPShareActivity.java 已弃用
-│              │      TestActivityPreview.java 已弃用
-│              │      TestEncodeLoopback.java 已弃用
-│              │      TestNoEncodeLoopback.java 已弃用
-│              │
-│              ├─adapter
-│              │      BaseRecyclerViewAdapter.java
-│              │      IDataFilter.java
-│              │
-│              └─view
-│                      IPEditText.java
+- app：Demo程序，包含组件初始化、受控端、控制端等范例代码<br>
+├─java<br>
+│  └─com<br>
+│      └─luoj<br>
+│          └─airdroid<br>
+│              │  AppContext.java<br>
+│              │  Util.java<br>
+│              │<br>
+│              ├─activity<br>
+│              │      AutoConnectActivity.java 连接和控制界面<br>
+│              │      InputActivity.java IP输入界面<br>
+│              │      MainActivity.java 功能列表界面<br>
+│              │      RTPPlayActivity.java 已弃用<br>
+│              │      RTPProjectionActivity.java 已弃用<br>
+│              │      RTPShareActivity.java 已弃用<br>
+│              │      TestActivityPreview.java 已弃用<br>
+│              │      TestEncodeLoopback.java 已弃用<br>
+│              │      TestNoEncodeLoopback.java 已弃用<br>
+│              │<br>
+│              ├─adapter<br>
+│              │      BaseRecyclerViewAdapter.java<br>
+│              │      IDataFilter.java<br>
+│              │<br>
+│              └─view<br>
+│                      IPEditText.java<br>
 
 会话协议
 -----------------
