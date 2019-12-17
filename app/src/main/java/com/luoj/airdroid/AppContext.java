@@ -31,9 +31,9 @@ public class AppContext extends Application {
         printCodecList();
 
         CodecParam.setOritationLandscape();
-        CodecParam.framerate = 20;
+        CodecParam.framerate = 30;
         CodecParam.bitrate = 1024 * 1024 * 1;
-        CodecParam.i_frame_interval = 5;
+        CodecParam.i_frame_interval = 1;
 
         XLog.d("has root -> " + ShellUtils.checkRootPermission());
         XLog.d("has system promission -> " + isSystemApp());

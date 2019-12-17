@@ -39,7 +39,7 @@ android {
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
 //            outputFileName = variant.name + "_${defaultConfig.versionName}_${releaseTime()}.apk"
-            outputFileName = "airdroid.apk"
+            outputFileName = "airdroid_${defaultConfig.versionName}.apk"
         }
     }
 }

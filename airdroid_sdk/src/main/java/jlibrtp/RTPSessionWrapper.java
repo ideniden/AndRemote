@@ -4,6 +4,10 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 
+/**
+ * 包装类
+ * 扩展实现分包发送的功能
+ */
 public class RTPSessionWrapper extends RTPSession {
 
     public RTPSessionWrapper(DatagramSocket rtpSocket, DatagramSocket rtcpSocket) {
