@@ -9,7 +9,7 @@ Android设备间远程控制：
 
 运行环境和条件
 -----------------
-- 受控端Android系统版本>=5.0
+- 受控端Android系统版本 >= 5.0
 - 受控端与控制端需要在同一个网段下，或相互均有独立IP地址
 - 受控端SDK所在的应用需要具备Android系统进程权限（用于事件注入）
 - 控制端解码器默认采用M1设备的SPS、PPS参数，可自行扩展
@@ -80,10 +80,10 @@ Android设备间远程控制：
 
 第三方依赖库
 -----------------
-jlibrtp0.2.2(Java源码版本)
-androidasync Socket服务端和客户端
-XLog 日志
-windowutil_1.0 自定义悬浮窗
+jlibrtp0.2.2(Java源码版本)<br>
+androidasync Socket服务端和客户端<br>
+XLog 日志<br>
+windowutil_1.0 自定义悬浮窗<br>
 
 
 受控端SDK集成方法
