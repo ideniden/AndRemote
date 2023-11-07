@@ -56,8 +56,8 @@ public class MainActivity extends BaseActivity {
 
     private void initListData() {
         if (BuildConfig.DEBUG) {
-            display = new String[]{"本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "以输入IP方式连接"};
-            classes = new Class[]{TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, InputActivity.class};
+            display = new String[]{"Test", "本地无编码屏幕共享", "本地编码屏幕共享", "发送端", "接收端", "以输入IP方式连接"};
+            classes = new Class[]{TestAcquireScreenFrameActivity.class, TestNoEncodeLoopback.class, TestEncodeLoopback.class, RTPProjectionActivity.class, RTPPlayActivity.class, InputActivity.class};
         } else {
             display = new String[]{"以输入IP方式连接"};
             classes = new Class[]{InputActivity.class};

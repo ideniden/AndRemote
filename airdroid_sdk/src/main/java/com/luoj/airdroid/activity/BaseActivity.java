@@ -12,12 +12,7 @@ public class BaseActivity extends Activity {
     }
 
     protected void toast(final String content){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(BaseActivity.this, content, Toast.LENGTH_SHORT).show();
-            }
-        });
+        runOnUiThread(() -> Toast.makeText(BaseActivity.this, content, Toast.LENGTH_SHORT).show());
     }
 
 }

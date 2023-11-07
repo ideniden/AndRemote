@@ -3,6 +3,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.luoj.airdroid">
 
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
+    <uses-permission
+        android:name="android.permission.INJECT_EVENTS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
     <application
         android:name=".AppContext"
         android:allowBackup="true"
@@ -24,48 +42,32 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.TestActivityPreview"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.TestEncodeLoopback"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.TestNoEncodeLoopback"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.RTPPlayActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.RTPShareActivity"
-            android:screenOrientation="landscape" />
-        <activity
-            android:name=".activity.RTPProjectionActivity"
-            android:screenOrientation="landscape" />
+            android:name=".activity.TestAcquireScreenFrameActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
 
-        <activity
-            android:name=".activity.InputActivity"
-            android:screenOrientation="portrait"></activity>
-        <activity
-            android:name=".activity.AutoConnectActivity"
-            android:screenOrientation="landscape" />
+        <activity android:name=".activity.TestEncodeLoopback" />
+        <activity android:name=".activity.TestNoEncodeLoopback" />
+        <activity android:name=".activity.RTPPlayActivity" />
+        <activity android:name=".activity.RTPShareActivity" />
+        <activity android:name=".activity.RTPProjectionActivity" />
 
+        <activity android:name=".activity.InputActivity" />
+        <activity android:name=".activity.AutoConnectActivity" />
+
+        <service
+            android:name=".service.ScreenShareService"
+            android:enabled="true"
+            android:exported="true"
+            android:foregroundServiceType="mediaProjection" />
         <service android:name=".service.ProjectionService" />
         <service android:name=".service.RTPProjectionService" />
         <service android:name=".service.RemoteService" />
     </application>
 
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.ACCESS_SUPERUSER" />
-    <uses-permission
-        android:name="android.permission.INJECT_EVENTS"
-        tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
 </manifest>

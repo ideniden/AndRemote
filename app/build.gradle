@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.luoj.airdroid"
         minSdkVersion 23
-        targetSdkVersion 28
-        versionCode 8
-        versionName "1.7"
+        targetSdkVersion 33
+        versionCode 9
+        versionName "1.8"
 //        multiDexEnabled true
 //        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
